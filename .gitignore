@@ -2,3 +2,9 @@ logs
 data/
 swedish_base_models
 models/
+
+**~
+**#
+.#
+**.#
+**__pycache__/
