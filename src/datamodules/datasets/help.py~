@@ -1,0 +1,52 @@
+from PIL import Image, ImageDraw, ImageFont
+# import PILasOPENCV as Image
+# import PILasOPENCV as ImageDraw
+# import PILasOPENCV as ImageFont
+import cv2
+import numpy as np
+import pdb
+import time 
+
+def add_text_on_img(img, text, left_corner, label_img=None, label_type=None, save_text_data=True, noise_class=None,
+                     text_rgb_color=(255, 0, 0), text_size=24, font="FreeSans.ttf", ep=6):
+    pil_img = img
+    if isinstance(pil_img, np.ndarray):
+        pil_img = Image.fromarray(np.dstack((img, img, img)))
+    draw = ImageDraw.Draw(pil_img)
+    font_text = ImageFont.truetype(font=font, size=text_size, encoding='utf-8')
+
+    text_width, text_heigth = draw.textsize(text, font_text)
+    
+    draw.text(left_corner, text, text_rgb_color, font=font_text)
+    cv2_img = cv2.cvtColor(np.asarray(pil_img), cv2.COLOR_RGB2BGR)
+
+    img[:] = cv2_img[:,:,0]
+
+    cv2.rectangle(img, (left_corner[0]-ep, left_corner[1]-ep), (left_corner[0]+text_width+ep,left_corner[1]+text_heigth+ep), (238, 75, 43),2)
+
+    if label_type !=None:
+        label_img[left_corner[1]-ep:left_corner[1]+text_heigth+ep, left_corner[0]-ep:left_corner[0]+text_width+ep] = label_type
+
+    return None
+
+class Add_noise():
+    def __init__(self, norm_par=(0.5,0.9)):
+        self.norm_par = norm_par
+
+    def add_noise_to_img(self, image):
+
+        uni_r = np.random.uniform(self.norm_par[0],self.norm_par[1])
+        imp_r = np.random.uniform(self.norm_par[0],self.norm_par[1])
+
+        uniform_noise = np.zeros((image.shape[0], image.shape[1]),dtype=np.uint8)
+        cv2.randu(uniform_noise,0,255)
+
+        ret,impulse_noise = cv2.threshold(uniform_noise,250,255,cv2.THRESH_BINARY)
+        impulse_noise = (impulse_noise*uni_r).astype(np.uint8)
+
+        uniform_noise = (uniform_noise*imp_r).astype(np.uint8)
+            
+        noisy_image2 = cv2.add(image,uniform_noise)
+        image = cv2.add(noisy_image2, impulse_noise)
+
+        return image 

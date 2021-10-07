@@ -1,0 +1,12 @@
+gpus: 1
+max_epochs: 50
+  # distributed_backend: ddp
+progress_bar_refresh_rate: 1
+benchmark: True
+precision: 16
+gradient_clip_val: 5.0
+num_sanity_val_steps: 3
+sync_batchnorm: True
+accumulate_grad_batches: 3
+  # resume_from_checkpoint: ./fk_doc_data/seg_data/model/seg-epoch=09-val_loss=0.105.ckpt
+  

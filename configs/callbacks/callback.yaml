@@ -1,0 +1,17 @@
+checkpoint_callback:
+  type: pytorch_lightning.callbacks.ModelCheckpoint
+  dirpath: "checkpoints/"
+  filename: seg-{epoch:02d}-{val_loss:.3f}
+  monitor: val_loss
+  verbose: False
+  mode: min
+  save_top_k: 3
+  #resume_from_checkpoint: ${data_dir}/model/epoch=122-step=51290.ckpt
+
+early_stop_callback:
+  type: pytorch_lightning.callbacks.EarlyStopping
+  monitor: val_loss
+  min_delta: 0.00
+  patience: 10
+  verbose: False
+  mode: min

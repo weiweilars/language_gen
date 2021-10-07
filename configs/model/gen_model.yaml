@@ -1,0 +1,15 @@
+_target_: src.models.gen_model.SkosaGenModel
+
+model:
+  model_folder: ${model_dir}/skosa_model
+  save_model_folder: ${model_dir}/saved_skosa_model
+  modified_voc_len: 50400
+
+optimizer:
+  type: torch.optim.Adam
+  lr: 0.00003
+
+scheduler:
+  type: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
+  T_0: 10
+  T_mult: 2

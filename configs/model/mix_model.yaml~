@@ -1,0 +1,84 @@
+_target_: src.models.mix_model.SegModel
+
+
+model:
+  type: segmentation_models_pytorch.FPN
+  #encoder_name: timm-res2net50_48w_2s
+  encoder_name: resnext50_32x4d
+  encoder_weights: ssl
+  in_channels: 1
+  #resume_from_checkpoint: data/time_data/long_label/model/epoch=136-step=57128.ckpt
+
+image:
+  height: 2339
+  width: 1728
+  resize: 1024
+  seg_classes:
+    heads_order:
+      - intyg
+      - eucard
+      - timetable
+    split_type: 0 # 0 split heads, 1 split card decoder and heads, 2 split all decoder 
+    intyg:
+      - 0
+      #- 5
+    eucard:
+      - 0
+      #- 9
+    timetable:
+      # - 0
+      # - 0
+      # - 0
+      - 7
+      - 32
+      - 4
+  class_label:
+    - intyg
+    - eucard
+    - timetable 
+    #- timetable_s
+  add_classification: False
+  
+
+optimizer:
+  type: torch.optim.Adam
+  lr: 0.0001
+
+scheduler:
+  type: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
+  T_0: 10
+  T_mult: 2
+
+
+train_loss:
+  # loss_1: 
+  #   name: facol
+  #   weight: 0.5
+  #   loss_fn:
+  #     type: segmentation_models_pytorch.losses.FocalLoss
+  #     mode: multiclass
+  #     from_logits: True
+  loss_2:
+    name: diceloss
+    weight: 1
+    loss_fn:
+      type: segmentation_models_pytorch.losses.DiceLoss
+      mode: multiclass
+      from_logits: True
+
+val_loss:
+  # loss_1: 
+  #   name: jaccardLoss
+  #   weight: 0.5
+  #   loss_fn:
+  #     type: segmentation_models_pytorch.losses.JaccardLoss
+  #     mode: multiclass
+  #     from_logits: True
+  loss_2:
+    name: diceloss
+    weight: 1
+    loss_fn:
+      type: segmentation_models_pytorch.losses.DiceLoss
+      mode: multiclass
+      from_logits: True
+    

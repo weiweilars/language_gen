@@ -1,0 +1,16 @@
+from matplotlib import pyplot as plt
+import cv2
+import random
+import numpy as np
+from numpy.linalg import inv
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import pdb
+from faker import Faker
+from help import add_text_on_img, data_generator, Add_noise
+import os
+
+fake = Faker()
+
+letters = 'abcdefghigklmnopqrstuvwxyzäåö'
+numbers = '1234567890'
