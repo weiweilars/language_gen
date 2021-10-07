@@ -51,15 +51,13 @@ class SkosaGenDataset(Dataset):
         
             self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-            self.tokenizer.add_special_tokens({'sep_token': '[SEP]'})
-
             self.tokenizer.add_tokens(new_tokens)
         
             self.tokenizer.save_pretrained(tokenizer_path)
 
             for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 
-                org_sentence = row.targetName +row.featureValue + self.tokenizer.eos_token
+                org_sentence = row.targetName + row.featureValue + self.tokenizer.eos_token
             
                 inputs = self.tokenizer(org_sentence, return_tensors="pt", max_length=max_token_size, padding='max_length', truncation=True)
 
