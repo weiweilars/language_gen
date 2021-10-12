@@ -6,10 +6,17 @@ import pickle
 import pandas as pd
 import numpy as np
 import shutil
-
+import json
+from collections import OrderedDict
 import torch
 from torch.utils.data import Dataset
 from transformers import GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel, GPT2Config
+
+import re
+import time
+
+
+
 
 
 class SkosaGenDataset(Dataset):
@@ -18,26 +25,12 @@ class SkosaGenDataset(Dataset):
     data_name = 'dataset.csv'
     label_path_name = 'label'
     
-    def __init__(self, data_path, tokenizer_path, max_token_size=512, generate_size=100, generate_new=True):
+    def __init__(self, data_path, tokenizer_path, max_token_size=512, generate_size=100, generate_new=True, generate_result=True):
 
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained(tokenizer_path)
         self.input_path = os.path.join(data_path, self.input_path_name)
         self.max_token = 512
-        
-        # model = GPT2LMHeadModel.from_pretrained(tokenizer_path)
-
-
-        # inputs_seq = self.tokenizer(["d130"], return_tensors="pt")
-
-        # result = model.generate(inputs_seq['input_ids'], max_length=10, num_beams=100, temperature=0.2, no_repeat_ngram_size=2, num_return_sequences=5)
-
-        # pdb.set_trace()
-
-        # tokenizer.decode(result[4])
-    
-        # print(result)
-
 
         if generate_new:
 
@@ -53,7 +46,7 @@ class SkosaGenDataset(Dataset):
 
             self.tokenizer.add_tokens(new_tokens)
         
-            self.tokenizer.save_pretrained(tokenizer_path)
+            #self.tokenizer.save_pretrained(tokenizer_path)
 
             for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 
@@ -93,6 +86,48 @@ class SkosaGenDataset(Dataset):
         # item['labels'] = self.labels['input_ids'][idx]
         
         return input_ids, attention_mask
+
+
+class SkosaQADataset(Dataset):
+
+    input_path_name = 'input'
+    data_name = 'question_answer.json'
+
+    def __init__(self, data_folder, model_folder, max_token_size=512):
+
+
+        self.tokenizer = GPT2TokenizerFast.from_pretrained(model_folder)
+        self.input_path = os.path.join(data_folder, self.input_path_name)
+        self.max_token = 512
+
+        f = open(os.path.join(data_folder, self.data_name))
+
+        data = json.load(f,object_pairs_hook=OrderedDict)
+
+        self.tokenizer.add_special_tokens({'pad_token': '[PAD]', 'sep_token': '[SEP]'})
+
+        self.tokenizer.save_pretrained(model_folder)
+
+        self.token_result = []
+        for i in data:
+            input = i['category'] + self.tokenizer.sep_token + i['question'] + self.tokenizer.sep_token + i['answer'] + self.tokenizer.eos_token
+            self.token_result.append(self.tokenizer(input, return_tensors="pt", max_length=max_token_size, padding='max_length', truncation=True))
+
+        self.data_length = len(self.token_result)
+
+    def __len__(self):
+        return self.data_length
+    
+    def __getitem__(self, idx):
+
+        input_ids = self.token_result[idx]['input_ids'][0]
+
+        attention_mask = self.token_result[idx]['attention_mask'][0]
+
+        return input_ids, attention_mask
+
+
+
         
 
 
@@ -100,100 +135,72 @@ if __name__ == '__main__':
 
 
     import torch.nn as nn
-    data_path = "../../../data/skosa_data/dataset.csv"
+    data_path = "../../../data/skosa_data/"
 
-    tokenizer_path = "../../../models/skosa_model/"
+    tokenizer_path = "../../../models/qa_model/"
 
     
-    # dataset=SkosaGenDataset(data_folder, tokenizer_path, generate_size=10)
+    dataset=SkosaQADataset(data_path, tokenizer_path)
 
 
-    # data_size = 10
-    # for i in range(data_size):
+    data_size = 10
+    for i in range(data_size):
 
-    #     dataset.__getitem__(i)
+        dataset.__getitem__(i)
 
     #     #pdb.set_trace()
    
     # # dataset = SegInfDataset(data_folder, )
 
-    #df = pd.read_csv(data_path, sep=';')
-    #df.reset_index()
+## generate the new sentence 
 
-    #new_tokens = [*set(df.targetName.to_list()),]
+    # df = pd.read_csv(data_path, sep=';')
+    # df.reset_index()
+
+    # new_tokens = [*set(df.targetName.to_list()),]
+
+    # new_tokens = [x for x in new_tokens if x]
     
-    tokenizer = GPT2Tokenizer.from_pretrained(tokenizer_path)
+    # tokenizer = GPT2TokenizerFast.from_pretrained(tokenizer_path)
 
-    #tokenizer.add_tokens(new_tokens)
+    # model = GPT2LMHeadModel.from_pretrained(tokenizer_path)
+
+    # file = open('result_top_p_k.txt', "a")
+
+    # for i in new_tokens:
+
+    #     file.write(i)
+    #     file.write('\n')
+
+    #     #print(i)
+
+    #     inputs_seq = tokenizer([i], return_tensors="pt")
+
+    #     #results = model.generate(inputs_seq['input_ids'], max_length=20, num_beams=5, temperature=0.9, no_repeat_ngram_size=2, num_return_sequences=1, do_sample=True, repetition_penalty=0.8)
+
+    #     results = model.generate(inputs_seq['input_ids'], do_sample=True, max_length=30, top_k=30, top_p=0.95, num_return_sequences=10)
+
+    #     for j in results:
+            
+    #         result = tokenizer.decode(j).replace(i, '')
+
+    #         result = result.replace('<|endoftext|>', '')
+    #         result = re.sub('\[PAD\]', '', result)
+
+    #         #rint(result)
+            
+    #         file.write(result)
+    #         file.write('\n')
+
+    #     time.sleep(10)
+
     
-    #tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-    #tokenizer.save_pretrained(tokenizer_path)
-
-    # configuration = GPT2Config.from_pretrained(tokenizer_path)
+    
+    # result = model.generate(inputs_seq['input_ids'], max_length=10, num_beams=100, temperature=0.2, no_repeat_ngram_size=2, num_return_sequences=5)
 
     # pdb.set_trace()
 
-   # model = GPT2LMHeadModel(configuration)
+    # tokenizer.decode(result[4])
 
-    inputs_seq = tokenizer(["jag"], return_tensors="pt")
-
-    print(inputs_seq)
-    # pdb.set_trace()
-    
-    
-    model = GPT2LMHeadModel.from_pretrained(tokenizer_path)
-
-    model.lm_head = nn.Linear(in_features=768, out_features=50300, bias=False)
-
-    model.transformer.wte = nn.Embedding(50300, 768)
-
-    # inputs = {key: val for key, val in inputs_seq.items()}
-
-    # pdb.set_trace()
-    
-    # outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['input_ids'])
-
-    
-    result = model.generate(inputs_seq['input_ids'], max_length=10, num_beams=100, temperature=0.2, no_repeat_ngram_size=2, num_return_sequences=5)
-
-    pdb.set_trace()
-
-    tokenizer.decode(result[4])
-
-    print(result)
-
-    
-    
-    # from pathlib import Path
-
-    # def read_imdb_split(split_dir):
-    #     split_dir = Path(split_dir)
-    #     texts = []
-    #     labels = []
-    #     for label_dir in ["pos", "neg"]:
-    #         for text_file in (split_dir/label_dir).iterdir():
-    #             texts.append(text_file.read_text())
-    #             labels.append(0 if label_dir is "neg" else 1)
-
-    #     return texts, labels
-
-    # train_texts, train_labels = read_imdb_split('../../../data/aclImdb/train')
-    # test_texts, test_labels = read_imdb_split('../../../data/aclImdb/test')
-
-
-    # from sklearn.model_selection import train_test_split
-    # train_texts, val_texts, train_labels, val_labels = train_test_split(train_texts, train_labels, test_size=.2)
-
-    
-
-    # from transformers import DistilBertTokenizerFast
-    # tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
-
-    # train_encodings = tokenizer(train_texts, truncation=True, padding=True)
-    # val_encodings = tokenizer(val_texts, truncation=True, padding=True)
-    # test_encodings = tokenizer(test_texts, truncation=True, padding=True)
-
-    # pdb.set_trace()
-
-    
+    # print(result)

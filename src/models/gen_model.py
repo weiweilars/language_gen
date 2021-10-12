@@ -17,10 +17,26 @@ class SkosaGenModel(pytorch_lightning.LightningModule):
 
         self.model = GPT2LMHeadModel.from_pretrained(model_params['model_folder'])
 
-        self.model.resize_token_embeddings(model_params['modified_voc_len'])
+        self.tokenizer = GPT2TokenizerFast.from_pretrained(model_params['model_folder'])
 
-        # pdb.set_trace()
-        
+        self.model.resize_token_embeddings(len(self.tokenizer))
+
+        # freeze the first 6 layers
+        for parameter in self.model.parameters():
+            parameter.requires_grad = False
+
+        for i, m in enumerate(self.model.transformer.h):        
+            #Only un-freeze the last n transformer blocks
+            if i >= model_params['freeze_layers']:
+                for parameter in m.parameters():
+                    parameter.requires_grad = True 
+
+        for parameter in self.model.transformer.ln_f.parameters():        
+            parameter.requires_grad = True
+
+        for parameter in self.model.lm_head.parameters():        
+            parameter.requires_grad = True
+
         # self.model.lm_head = nn.Linear(in_features=768, out_features=model_params['modified_voc_len'], bias=False)
 
         # self.model.transformer.wte = nn.Embedding(model_params['modified_voc_len'], 768)
@@ -55,9 +71,11 @@ class SkosaGenModel(pytorch_lightning.LightningModule):
 
     def validation_step(self, batch, batch_idx):
 
-        input_ids, attention_mask= batch
+        # pdb.set_trace()
+        # self.model.save_pretrained(self.hparams['model']['save_model_folder'])
 
-        #pdb.set_trace()
+
+        input_ids, attention_mask= batch
 
         results = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=input_ids)
 

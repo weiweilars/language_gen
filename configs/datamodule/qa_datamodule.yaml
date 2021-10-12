@@ -2,10 +2,8 @@ _target_: src.datamodules.gen_datamodule.SkosaGenDataModule
 
 
 data_loader:
-  generate_new: True
-  dataset: SkosaGenDataset
-  generate_size: 50
   max_token_size: 512
+  dataset: SkosaQADataset
   data_folder: ${data_dir}/skosa_data
   model_folder: ${model_dir}/skosa_model
   num_workers: 12
