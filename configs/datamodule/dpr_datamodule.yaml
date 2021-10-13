@@ -1,0 +1,24 @@
+_target_: src.datamodules.dpr_datamodule.DPRDataModule
+
+
+train_data_loader:
+  query_tokenizer: ${model_dir}/bert-base-swedish-cased
+  passage_tokenizer: ${model_dir}/bert-base-swedish-cased
+  max_seq_len_query: 256
+  max_seq_len_passage: 512
+  data_dir: ${data_dir}/dpr_data
+  data_type: swedish_dpr_train
+  generate_new: True
+  batch_size: 4
+
+
+val_data_loader:
+  query_tokenizer: ${model_dir}/bert-base-swedish-cased
+  passage_tokenizer: ${model_dir}/bert-base-swedish-cased
+  max_seq_len_query: 256
+  max_seq_len_passage: 512
+  data_dir: ${data_dir}/dpr_data
+  data_type: swedish_dpr_dev
+  generate_new: True
+  batch_size: 4
+  
