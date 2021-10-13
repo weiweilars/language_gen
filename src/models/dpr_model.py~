@@ -1,0 +1,72 @@
+import argparse
+import logging
+import os
+import sys
+import time
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+#import pytorch_lightning as pl
+import torch
+from torch import nn 
+import torch.distributed as dist
+#from pytorch_lightning.accelerators.ddp_accelerator import DDPAccelerator
+#from pytorch_lightning.cluster_environments import TorchElasticEnvironment
+from torch.utils.data import DataLoader
+
+import pdb
+
+from transformers import (
+    AutoConfig,
+    AutoTokenizer,
+    DPRConfig, 
+    DPRContextEncoderTokenizerFast,
+    DPRQuestionEncoderTokenizerFast,
+    DPRContextEncoder,
+    DPRQuestionEncoder
+)
+
+from data_handler import DPRDataset
+
+
+class DPRModel(nn.Module):
+
+    def __init__(
+            self,
+            query_model_base,
+            passage_model_base,
+            device
+    ):
+        super(DPRModel, self).__init__()
+        self.query_encoder = DPRQuestionEncoder.from_pretrained(query_model_base).to(device)
+        self.passage_encoder = DPRContextEncoder.from_pretrained(passage_model_base).to(device)
+
+    def forward(self, question_input_id, question_mask, context_input_ids, context_masks):
+        pdb.set_trace()
+        question_embeddings = self.query_encoder(question_input_id, question_mask)
+        context_embeddings = self.passage_encoder(context_input_ids, context_masks)
+        pdb.set_trace()
+
+if __name__ == "__main__":
+
+    device = 'cuda'
+
+    
+    query_model = 'KB/bert-base-swedish-cased'
+    passage_model = 'KB/bert-base-swedish-cased'
+
+    query_tok = AutoTokenizer.from_pretrained('KB/bert-base-swedish-cased')
+    passage_tok = AutoTokenizer.from_pretrained('KB/bert-base-swedish-cased')
+
+
+    dataset = DPRDataset(query_tokenizer=query_tok, passage_tokenizer=passage_tok)
+    train_data = DataLoader(dataset, batch_size=2, shuffle=True, num_workers=0)
+    model = DPRModel(query_model, passage_model, device).to(device)
+
+    for index, data in enumerate(train_data,0):
+        query_id, query_mask, passage_ids, passage_masks = data
+        query_id, query_mask, passage_ids, passage_masks = query_id.to(device), query_mask.to(device), passage_ids.to(device), passage_masks.to(device) 
+    
+        model(query_id, query_mask, passage_ids, passage_masks)
