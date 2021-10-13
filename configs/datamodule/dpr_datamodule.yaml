@@ -8,7 +8,7 @@ train_data_loader:
   max_seq_len_passage: 512
   data_dir: ${data_dir}/dpr_data
   data_type: swedish_dpr_train
-  generate_new: True
+  generate_new: False
   batch_size: 4
 
 
@@ -19,6 +19,6 @@ val_data_loader:
   max_seq_len_passage: 512
   data_dir: ${data_dir}/dpr_data
   data_type: swedish_dpr_dev
-  generate_new: True
+  generate_new: False
   batch_size: 4
   

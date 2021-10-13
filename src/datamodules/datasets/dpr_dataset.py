@@ -92,9 +92,7 @@ class DPRDataset(Dataset):
             shuffle_positives=False,
             generate_new=True):
 
-        data_file = os.path.join(data_dir, data_type +'.json')
-        data_dict = read_dpr_json(data_file)
-        self.data_length = len(data_dict)
+    
         self.save_path = os.path.join(data_dir, data_type)
 
         
@@ -111,6 +109,10 @@ class DPRDataset(Dataset):
         self.passage_tokenizer = AutoTokenizer.from_pretrained(passage_tokenizer)
 
         if generate_new:
+            data_file = os.path.join(data_dir, data_type +'.json')
+            data_dict = read_dpr_json(data_file)
+            self.data_length = len(data_dict)
+            
             if not os.path.exists(self.save_path):
                 os.makedirs(self.save_path)
             else:
@@ -121,6 +123,9 @@ class DPRDataset(Dataset):
             self.data = self._convert_queries(data_dict)
         else:
             assert os.path.exists(self.save_path)
+            list = os.listdir(self.save_path)
+            self.data_length = len(list)
+            
 
         
     # def dataset_from_dicts(self, dicts, fp):
