@@ -5,9 +5,8 @@ model:
   save_query_model: ${model_dir}/query_model
   passage_model: ${model_dir}/bert-base-swedish-cased
   save_passage_model: ${model_dir}/passage_model
-  modified_voc_len: 50400
-  freeze_layers: 6
-
+  dropout: 0.25
+  
 optimizer:
   type: torch.optim.Adam
   lr: 0.00003

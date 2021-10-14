@@ -39,10 +39,20 @@ class DPRModel(pytorch_lightning.LightningModule):
         self.query_encoder = AutoModel.from_pretrained(model_params['query_model'])
         self.passage_encoder = AutoModel.from_pretrained(model_params['passage_model'])
 
+        self.dropout = nn.Dropout(model_params['dropout'])
+
         
-    def forward(self, question_input_id, question_mask, context_input_ids, context_masks):
-        question_embeddings = self.query_encoder(question_input_id, question_mask)
-        context_embeddings = self.passage_encoder(context_input_ids, context_masks)
+    def forward(self, inputs):
+
+        question_embeddings = self.query_encoder(inputs[0], inputs[1])
+        pos_embeddings = self.passage_encoder(inputs[2], inputs[3])
+        neg_embeddings = self.passage_encoder(inputs[4], inputs[5])
+
+        question_embeddings = self.dropout(question_embeddings.pooler_output)
+        pos_embeddings = self.dropout(pos_embeddings.pooler_output)
+        neg_embeddings = self.dropout(neg_embeddings.pooler_output)
+
+        return question_embeddings, pos_embeddings, neg_embeddings
 
 
     def _get_current_lr(self) -> torch.Tensor:
@@ -50,18 +60,10 @@ class DPRModel(pytorch_lightning.LightningModule):
         return torch.Tensor([lr])[0].cuda()
 
     def training_step(self, batch, batch_idx):
-        question_input_ids = batch[0]
-        question_attention_mask = batch[1]
-        pos_context_input_ids = batch[2]
-        pos_context_attention_mask = batch[3]
-        neg_context_input_ids = batch[4]
-        neg_context_attention_mask = batch[5]
 
-        question_embedings = self.query_encoder(input_ids=question_input_ids, attention_mask=question_attention_mask).pooler_output
-        pos_embedings = self.passage_encoder(input_ids=pos_context_input_ids, attention_mask=pos_context_attention_mask).pooler_output
-        neg_embedings = self.passage_encoder(input_ids=neg_context_input_ids, attention_mask=neg_context_attention_mask).pooler_output
-
-        loss = dpr_loss(question_embedings, pos_embedings, neg_embedings)
+        question_embeddings, pos_embeddings, neg_embeddings = self(batch)
+        
+        loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
         
         self.log("train_loss", loss)
         
@@ -69,18 +71,9 @@ class DPRModel(pytorch_lightning.LightningModule):
 
     def validation_step(self, batch, batch_idx):
 
-        question_input_ids = batch[0]
-        question_attention_mask = batch[1]
-        pos_context_input_ids = batch[2]
-        pos_context_attention_mask = batch[3]
-        neg_context_input_ids = batch[4]
-        neg_context_attention_mask = batch[5]
-
-        question_embedings = self.query_encoder(input_ids=question_input_ids, attention_mask=question_attention_mask).pooler_output
-        pos_embedings = self.passage_encoder(input_ids=pos_context_input_ids, attention_mask=pos_context_attention_mask).pooler_output
-        neg_embedings = self.passage_encoder(input_ids=neg_context_input_ids, attention_mask=neg_context_attention_mask).pooler_output
-
-        loss = dpr_loss(question_embedings, pos_embedings, neg_embedings)
+        question_embeddings, pos_embeddings, neg_embeddings = self(batch)
+        
+        loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
         
         self.log("val_loss", loss)
         
