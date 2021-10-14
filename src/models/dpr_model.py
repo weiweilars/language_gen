@@ -21,9 +21,10 @@ def dpr_loss(question_embedings, pos_embedings, neg_embedings):
     pos_similar = (question_embedings * pos_embedings).sum(-1)
     neg_similar = (question_embedings * neg_embedings).sum(-1)
 
-    loss = torch.log(1+ torch.exp(neg_similar-pos_similar)).mean()
+    index_select = (pos_similar > neg_similar) 
+    loss = torch.log(1+ torch.exp(neg_similar-pos_similar))[index_select]
 
-    return loss
+    return loss.mean()
     
     
 
