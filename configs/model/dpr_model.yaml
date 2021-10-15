@@ -6,6 +6,7 @@ model:
   passage_model: ${model_dir}/bert-base-swedish-cased
   save_passage_model: ${model_dir}/passage_model
   dropout: 0.25
+  freeze_layers: 6
   
 optimizer:
   type: torch.optim.Adam

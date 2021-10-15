@@ -16,12 +16,13 @@ from src.models.help_function import object_from_dict
 from transformers import AutoModel
 
 
-def dpr_loss(question_embedings, pos_embedings, neg_embedings):
+def dpr_loss(question_embedings, pos_embedings, neg_embedings, temp=0.7):
 
-    pos_similar = (question_embedings * pos_embedings).sum(-1)
-    neg_similar = (question_embedings * neg_embedings).sum(-1)
+    pos_similar = (question_embedings * pos_embedings).sum(-1)/temp
+    neg_similar = (question_embedings * neg_embedings).sum(-1)/temp
 
-    #index_select = (pos_similar < neg_similar) 
+    #index_select = (pos_similar < neg_similar)
+    
     loss = torch.log(1+ torch.exp(neg_similar-pos_similar))
     
     return loss.mean()
@@ -41,6 +42,34 @@ class DPRModel(pytorch_lightning.LightningModule):
         self.passage_encoder = AutoModel.from_pretrained(model_params['passage_model'])
 
         self.dropout = nn.Dropout(model_params['dropout'])
+
+        for parameter in self.query_encoder.parameters():
+            parameter.requires_grad = False
+
+        for i, m in enumerate(self.query_encoder.encoder.layer):
+
+            #Only un-freeze the last n transformer blocks
+            if i >= model_params['freeze_layers']:
+                for parameter in m.parameters():
+                    parameter.requires_grad = True 
+
+        for parameter in self.query_encoder.pooler.parameters():        
+            parameter.requires_grad = True
+
+        for parameter in self.passage_encoder.parameters():
+            parameter.requires_grad = False
+
+        for i, m in enumerate(self.passage_encoder.encoder.layer):
+
+            #Only un-freeze the last n transformer blocks
+            if i >= model_params['freeze_layers']:
+                for parameter in m.parameters():
+                    parameter.requires_grad = True 
+
+        for parameter in self.passage_encoder.pooler.parameters():        
+            parameter.requires_grad = True
+
+
 
         
     def forward(self, inputs):
