@@ -1,12 +1,12 @@
 _target_: src.models.dpr_model.DPRModel
 
 model:
-  query_model: ${model_dir}/bert-base-swedish-cased
+  query_model: ${model_dir}/dpr-question_encoder-bert-base-multilingual
   save_query_model: ${model_dir}/query_model
-  passage_model: ${model_dir}/bert-base-swedish-cased
+  passage_model: ${model_dir}/dpr-ctx_encoder-bert-base-multilingual
   save_passage_model: ${model_dir}/passage_model
   dropout: 0.25
-  freeze_layers: 6
+  freeze_layers: 8
   
 optimizer:
   type: torch.optim.Adam

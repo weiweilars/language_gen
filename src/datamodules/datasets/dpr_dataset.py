@@ -199,8 +199,6 @@ class DPRDataset(Dataset):
                                                                   padding="max_length",
                                                                   max_length=self.max_seq_len_passage,
                                                                   return_token_type_ids=True)
-
-            
             ctx_segment_ids = np.zeros_like(ctx_inputs["token_type_ids"], dtype=np.int32)
             tokenized_passage = [self.passage_tokenizer.convert_ids_to_tokens(ctx) for ctx in ctx_inputs["input_ids"]]
 

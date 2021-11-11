@@ -1,10 +1,11 @@
 logs
 data/
 swedish_base_models
-models
+!/models/*
 
 **~
 **#
 .#
 **.#
-**/__pycache__/
+**__pycache__/
+**.pyc

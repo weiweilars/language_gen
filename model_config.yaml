@@ -1,0 +1,216 @@
+model:
+    - conditional_qa
+    - conditional_icf
+    - freetext
+
+confitional_qa:
+  conditions:
+    - FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Bostadstillägg
+    - FK-Arbets_sökande-Om du deltar i ett program hos Arbetsförmedlingen
+    - FK-Funktions_nedsättning-Särskilt tandvårdsbidrag
+    - FK-Förälder-Barnbidrag och flerbarnstillägg
+    - FK-Förälder-Adoption-Föräldrapenning
+    - FK-Sjuk-Om du har skadat dig i arbetet-Arbetsskadesjukpenning
+    - FK-Förälder-10-dagar vid barns födelse
+    - FK-Sjuk-Studerande-Om du blir sjuk
+    - FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Sjukersättning 
+    - FK-Arbets_sökande-Om du deltar i etableringsprogrammet hos Arbetsförmedlingen
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Vårdbidrag
+    - FK-Sjuk-Funktionsnedsättning eller långvarig sjukdom-Aktivitetsersättning 
+    - FK-Sjuk-Aktiebolag-Närståendepenning
+    - FK-Förälder-Adoption-Adoptionsbidrag
+    - FK-Förälder-Vård av barn (vab)
+    - FK-Sjuk-Arbetssökande-Sjukpenning 
+    - FK-Sjuk-Enskild firma-Förebyggande sjukpenning
+    - FK-Sjuk-Om du skadat dig under tiden som frihetsberövad-Ersättning för kostnader vid personskada
+    - FK-Funktions_nedsättning-Bilstöd för vuxna
+    - FK-Sjuk-Arbetssökande-Förebyggande sjukpenning
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Kontaktdagar
+    - FK-Sjuk-Anställd-Sjukpenning
+    - FK-Sjuk-Anställd-Förebyggande sjukpenning
+    - FK-Förälder-Adoption-Underhållsstöd
+    - FK-Sjuk-Aktiebolag-Smittbärarpenning och reseersättning för smittbärare
+    - FK-Förälder-Väntar barn-Graviditetspenning
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Bilstöd för barn
+    - FK-Sjuk-Aktiebolag-Sjukpenning
+    - FK-Funktions_nedsättning-Arbetshjälpmedel
+    - FK-Sjuk-Om du rest utomlands och blivit akut sjuk
+    - FK-Förälder-Väntar barn-Föräldrapenning innan barnets födelse
+    - FK-Funktions_nedsättning-Handikappersättning
+    - FK-Förälder-För föräldrar som inte lever ihop-Barnet bor hos båda föräldrarna
+    - FK-Sjuk-Föräldraledig
+    - FK-Sjuk-Anställd-Särskilt högriskskydd
+    - FK-Sjuk-Arbetssökande-Närståendepenning
+    - FK-Funktions_nedsättning-Assistansersättning för vuxna
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Omvårdnadsbidrag
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Assistansersättning för barn
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Merkostnadsersättning för barn
+    - FK-Funktions_nedsättning-Bostadstillägg
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Kontaktdagar
+    - FK-Sjuk-Anställd-Smittbärarpenning och reseersättning för smittbärare
+    - FK-Sjuk-Enskild firma-Smittbärarpenning och reseersättning för smittbärare
+    - FK-Sjuk-Om du skadat dig under tiden som frihetsberövad-Sjukpenning enligt det statliga personskadeskyddet
+    - FK-Sjuk-Om du har skadat dig i arbetet-Ersättning för kostnader vid arbetsskada
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Bilstöd för barn
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Vårdbidrag
+    - FK-Arbets_sökande-Bostadsbidrag-Bostadsbidrag till barnfamiljer
+    - FK-Sjuk-Aktiebolag-Förebyggande sjukpenning
+    - FK-Sjuk-Om du skadat dig under militär utbildning eller vid verksamhet inom det civila försvaret-Livränta – ersättning för förlorad arbetsinkomst vid personskada
+    - FK-Sjuk-Arbetssökande-Smittbärarpenning och reseersättning för smittbärare
+    - FK-Sjuk-Enskild firma-Närståendepenning
+    - FK-Sjuk-Om du skadat dig under militär utbildning eller vid verksamhet inom det civila försvaret-Ersättning för kostnader vid personskada
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Omvårdnadsbidrag
+    - FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Aktivitetsersättning vid förlängd skolgång
+    - FK-Förälder-Om ditt barn har en funk_tions_ned_sätt_ning-Merkostnadsersättning för barn
+    - FK-Förälder-Föräldrapenning
+    - FK-Sjuk-Funktionsnedsättning eller långvarig sjukdom-Sjukersättning 
+    - FK-Sjuk-Anställd-Närståendepenning
+    - FK-Arbets_sökande-Bostadsbidrag-Bostadsbidrag till unga (under 29 år)
+    - FK-Funktions_nedsättning-Merkostnadsersättning för vuxna
+    - FK-Sjuk-Enskild firma-Sjukpenning 
+    - FK-Sjuk-Studerande-Om du är smittad av en allmänfarlig sjukdom
+    - FK-Förälder-För föräldrar som inte lever ihop-Om du ska separera
+    - FK-Sjuk-Om du har skadat dig i arbetet-Livränta – ersättning för förlorad arbetsinkomst vid arbetsskada
+    - FK-Funktions_nedsättning-Särskilt högriskskydd
+    - FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Aktivitetsersättning
+    - FK-Funktions_nedsättning-Om ditt barn har en funktionsnedsättning-Assistansersättning för barn
+    - FK-Förälder- Bostadsbidrag till barnfamiljer
+    - FK-Sjuk-Aktiebolag-Särskilt högriskskydd
+  open_end: 0
+  model_path: ./models/qa_model
+  do_sample: True
+  max_length: 30
+  top_k: 30
+  top_p: 0.95
+  
+
+conditional_icf:
+  conditions:
+    - d170
+    - d730
+    - d430
+    - d620
+    - d859
+    - d115
+    - b144
+    - d166
+    - d120
+    - d349
+    - d610
+    - d449
+    - d870
+    - d220
+    - d335
+    - d360
+    - d199
+    - d530
+    - d451
+    - d310
+    - d420
+    - d298A
+    - e599
+    - d599
+    - d130
+    - d429
+    - d345
+    - b110
+    - d155
+    - d230
+    - d930
+    - d550
+    - d470
+    - d879
+    - b140
+    - d210
+    - d440
+    - b220
+    - d840
+    - d399
+    - d135
+    - b180
+    - d145
+    - b172
+    - d779
+    - d410
+    - d850
+    - e360
+    - d110
+    - d839
+    - d660
+    - d298
+    - d172
+    - d299
+    - e110
+    - d770
+    - d465
+    - d750
+    - d760
+    - d355
+    - d710
+    - d460
+    - d640
+    - b114
+    - e115
+    - b117
+    - d510
+    - d570
+    - e340
+    - b122
+    - d350
+    - b330
+    - d329
+    - d499
+    - b156
+    - d649
+    - d860
+    - d540
+    - d129
+    - d133 
+    - b134
+    - d630
+    - b139
+    - d330
+    - d177
+    - d160
+    - d325
+    - d140
+    - d163
+    - d799
+    - d469
+    - d175
+    - b167
+    - b147
+    - b160
+    - b240
+    - e330
+    - e120
+    - d920
+    - b130
+    - b126
+    - d699
+    - d845
+    - d560
+    - b164
+    - d240
+    - d520
+    - d650
+    - d450
+    - d740
+    - d475
+    - b230
+    - d315
+    - d720
+    - d415
+    - d445
+    - d446
+    - b399
+    - b299
+    - d455
+    - b152
+  open_end: 0
+  model_path: ./models/icf_model
+  do_sample: True
+  max_length: 30
+  top_k: 30
+  top_p: 0.95
+

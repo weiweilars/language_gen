@@ -13,7 +13,7 @@ from torch import nn
 import pdb
 from src.models.help_function import object_from_dict
 
-from transformers import AutoModel
+from transformers import DPRContextEncoder, DPRQuestionEncoder
 
 
 def dpr_loss(question_embedings, pos_embedings, neg_embedings, temp=0.7):
@@ -38,36 +38,37 @@ class DPRModel(pytorch_lightning.LightningModule):
 
         model_params = self.hparams['model'].copy()
         
-        self.query_encoder = AutoModel.from_pretrained(model_params['query_model'])
-        self.passage_encoder = AutoModel.from_pretrained(model_params['passage_model'])
-
+        self.query_encoder = DPRQuestionEncoder.from_pretrained(model_params['query_model'])
+        self.passage_encoder = DPRContextEncoder.from_pretrained(model_params['passage_model'])
+        
         self.dropout = nn.Dropout(model_params['dropout'])
 
-        for parameter in self.query_encoder.parameters():
-            parameter.requires_grad = False
+        # for parameter in self.query_encoder.parameters():
+        #     parameter.requires_grad = False
 
-        for i, m in enumerate(self.query_encoder.encoder.layer):
+        # for i, m in enumerate(self.query_encoder.encoder.layer):
 
-            #Only un-freeze the last n transformer blocks
-            if i >= model_params['freeze_layers']:
-                for parameter in m.parameters():
-                    parameter.requires_grad = True 
+        #     #Only un-freeze the last n transformer blocks
+        #     if i >= model_params['freeze_layers']:
+        #         for parameter in m.parameters():
+        #             parameter.requires_grad = True 
 
-        for parameter in self.query_encoder.pooler.parameters():        
-            parameter.requires_grad = True
+        # for parameter in self.query_encoder.pooler.parameters():        
+        #     parameter.requires_grad = True
 
-        for parameter in self.passage_encoder.parameters():
-            parameter.requires_grad = False
+            
+        # for parameter in self.passage_encoder.parameters():
+        #     parameter.requires_grad = False
 
-        for i, m in enumerate(self.passage_encoder.encoder.layer):
+        # for i, m in enumerate(self.passage_encoder.encoder.layer):
 
-            #Only un-freeze the last n transformer blocks
-            if i >= model_params['freeze_layers']:
-                for parameter in m.parameters():
-                    parameter.requires_grad = True 
+        #     #Only un-freeze the last n transformer blocks
+        #     if i >= model_params['freeze_layers']:
+        #         for parameter in m.parameters():
+        #             parameter.requires_grad = True 
 
-        for parameter in self.passage_encoder.pooler.parameters():        
-            parameter.requires_grad = True
+        # for parameter in self.passage_encoder.pooler.parameters():        
+        #     parameter.requires_grad = True
 
 
 
@@ -91,6 +92,7 @@ class DPRModel(pytorch_lightning.LightningModule):
 
     def training_step(self, batch, batch_idx):
 
+        
         question_embeddings, pos_embeddings, neg_embeddings = self(batch)
         
         loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
@@ -101,6 +103,8 @@ class DPRModel(pytorch_lightning.LightningModule):
 
     def validation_step(self, batch, batch_idx):
 
+        
+        #pdb.set_trace()
         question_embeddings, pos_embeddings, neg_embeddings = self(batch)
         
         loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
