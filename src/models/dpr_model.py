@@ -13,7 +13,7 @@ from torch import nn
 import pdb
 from src.models.help_function import object_from_dict
 
-from transformers import DPRContextEncoder, DPRQuestionEncoder
+from transformers import DPRContextEncoder, DPRQuestionEncoder, AutoModel
 
 
 def dpr_loss(question_embedings, pos_embedings, neg_embedings, temp=0.7):
@@ -38,8 +38,8 @@ class DPRModel(pytorch_lightning.LightningModule):
 
         model_params = self.hparams['model'].copy()
         
-        self.query_encoder = DPRQuestionEncoder.from_pretrained(model_params['query_model'])
-        self.passage_encoder = DPRContextEncoder.from_pretrained(model_params['passage_model'])
+        self.query_encoder = AutoModel.from_pretrained(model_params['query_model'])
+        self.passage_encoder = AutoModel.from_pretrained(model_params['passage_model'])
         
         self.dropout = nn.Dropout(model_params['dropout'])
 

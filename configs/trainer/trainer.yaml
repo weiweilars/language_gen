@@ -13,4 +13,3 @@ sync_batchnorm: True
 accumulate_grad_batches: 48
 # reload_dataloaders_every_epoch: True
 # resume_from_checkpoint: ${model_dir}/epoch=17-step=16235.ckpt
-  

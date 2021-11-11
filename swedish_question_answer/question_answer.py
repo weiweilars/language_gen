@@ -97,6 +97,10 @@ if __name__ == '__main__':
     question_model = "../swedish_base_models/dpr-question_encoder-bert-base-multilingual/"
     context_model = "../swedish_base_models/dpr-ctx_encoder-bert-base-multilingual/"
 
+    # question_model = "facebook/dpr-question_encoder-multiset-base"
+
+    # context_model = "facebook/dpr-ctx_encoder-multiset-base"
+
     squad_model = '../swedish_base_models/bert-base-swedish-squad2/'
 
     document = '../data/swedish_pdf'
