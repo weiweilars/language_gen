@@ -1,4 +1,5 @@
 from transformers import GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel, GPT2Config
+import pdb
 
 ''' create app.py to do following step (see example in image_segmentation)
 
@@ -30,32 +31,29 @@ def predict(condition, num_generate_data, model_path, do_sample=True, max_length
 
     model = GPT2LMHeadModel.from_pretrained(model_path)
 
+    model.config.pad_token_id = model.config.eos_token_id
+
     input = condition + tokenizer.sep_token
 
     inputs_seq = tokenizer(input, return_tensors="pt")
-
-    if open_end:
-        ## will train a open-end model to check how to write this one
-        pass 
 
     results = model.generate(inputs_seq['input_ids'], do_sample=do_sample, max_length=max_length, top_k=top_k, top_p=top_p, num_return_sequences=num_generate_data)
 
     results = [tokenizer.decode(j).replace('<|endoftext|>', '').replace('[SEP]', ' : ').replace('[PAD]', '') for j in results]
 
-
     return results 
 
 if __name__ == '__main__':
 
-    # condition = 'FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Bostadstillägg'
+    condition = 'FK-Funktions_nedsättning-Aktivitetsersättning och sjukersättning-Bostadstillägg'
 
-    condition = 'd779'
+    #condition = 'd779'
 
-    num_generate_data = 10
+    num_generate_data = 1
 
-    # model_path = "./models/qa_model/"
+    model_path = "./models/qa_model/"
 
-    model_path = "./models/skosa_model/"
+    #model_path = "./models/skosa_model/"
     
     result = predict(condition, num_generate_data, model_path)
 

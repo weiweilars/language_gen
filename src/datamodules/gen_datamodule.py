@@ -1,5 +1,5 @@
 from torch.utils.data import DataLoader, random_split
-from src.datamodules.datasets.dataset import SkosaGenDataset, SkosaQADataset
+from src.datamodules.datasets.dataset import SkosaGenDataset, SkosaQADataset, LongTextDataset
 from pytorch_lightning import LightningDataModule
 from typing import Optional
 import numpy as np
@@ -33,10 +33,13 @@ class SkosaGenDataModule(LightningDataModule):
 
             dataset = SkosaGenDataset(**self.data_params)
 
-        else:
+        elif self.dataset_fn == 'SkosaQADataset':
 
             dataset = SkosaQADataset(**self.data_params)
-             
+        else:
+            
+            dataset = LongTextDataset(**self.data_params)
+            
         dataset_size = dataset.data_length
         split = int(np.floor(self.test_ratio * dataset_size))
 

@@ -2,10 +2,8 @@ _target_: src.datamodules.gen_datamodule.SkosaGenDataModule
 
 
 data_loader:
-  generate_new: True
   dataset: LongTextDataset
-  generate_size: 50
-  max_token_size: 512
+  max_token_size: 128
   data_folder: ${data_dir}/swedish_pdf
   model_folder: ${model_dir}/long_text_generator
   num_workers: 12

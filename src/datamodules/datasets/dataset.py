@@ -14,7 +14,7 @@ from transformers import GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel, GPT2
 
 import re
 import time
-
+import subprocess
 
 
 
@@ -124,6 +124,81 @@ class SkosaQADataset(Dataset):
 
         attention_mask = self.token_result[idx]['attention_mask'][0]
 
+        pdb.set_trace()
+
+        return input_ids, attention_mask
+
+
+class LongTextDataset(Dataset):
+
+    input_path_name = 'input'
+    data_name = 'text.pdf'
+
+    def __init__(self, data_folder, model_folder, max_token_size=512, remove_numeric_tables=True):
+
+
+        self.tokenizer = GPT2TokenizerFast.from_pretrained(model_folder)
+        self.data_path = os.path.join(data_folder, self.data_name)
+        self.input_path = os.path.join(data_folder, self.input_path_name)
+        self.max_token = max_token_size
+        self.remove_numeric_tables = remove_numeric_tables
+
+        text = self._read_pdf(self.data_path)
+
+        tokenized_text = self.tokenizer.convert_tokens_to_ids(self.tokenizer.tokenize(text))
+        # self.tokenizer.add_special_tokens({'pad_token': '[PAD]', 'sep_token': '[SEP]'})
+
+        # self.tokenizer.save_pretrained(model_folder)
+
+        self.examples = []
+        for i in range(0, len(tokenized_text) - max_token_size + 1, max_token_size):
+                self.examples.append(tokenized_text[i : i + max_token_size])
+
+
+        self.data_length = len(self.examples)
+
+    def _read_pdf(self, file_path, encoding="UTF-8"):
+        command = ["pdftotext", "-enc", encoding, str(file_path), "-"]
+        output = subprocess.run(command, stdout=subprocess.PIPE, shell=False)  # type: ignore
+        document = output.stdout.decode(errors="ignore")
+
+        
+        pages = document.split("\f")
+        
+        pages = pages[:-1]  # the last page in the split is always empty.
+        cleaned_pages = []
+        for page in pages:
+            lines = page.splitlines()
+            cleaned_lines = []
+            for line in lines:
+                words = line.split()
+                digits = [word for word in words if any(i.isdigit() for i in word)]
+
+                # remove lines having > 40% of words as digits AND not ending with a period(.)
+                if self.remove_numeric_tables:
+                    if (
+                        words
+                        and len(digits) / len(words) > 0.4
+                        and not line.strip().endswith(".")
+                    ):
+                        continue
+                cleaned_lines.append(line)
+
+            page = "\n".join(cleaned_lines)
+            cleaned_pages.append(page)
+            
+        return "".join(cleaned_pages[9:])
+        
+
+    def __len__(self):
+        return self.data_length
+    
+    def __getitem__(self, idx):
+
+        input_ids = torch.tensor(self.examples[idx])
+
+        attention_mask = torch.ones(len(input_ids), dtype=torch.int64)
+
         return input_ids, attention_mask
 
 
@@ -133,14 +208,17 @@ class SkosaQADataset(Dataset):
 
 if __name__ == '__main__':
 
+    # data_path = "../../../data/skosa_data/"
 
-    import torch.nn as nn
-    data_path = "../../../data/skosa_data/"
-
-    tokenizer_path = "../../../models/qa_model/"
+    # tokenizer_path = "../../../models/qa_model/"
 
     
-    dataset=SkosaQADataset(data_path, tokenizer_path)
+    # dataset=SkosaQADataset(data_path, tokenizer_path)
+
+    data_path = "../../../data/swedish_pdf/"
+    tokenizer_path = "../../../models/long_text_generator"
+
+    dataset=LongTextDataset(data_path, tokenizer_path)
 
 
     data_size = 10
