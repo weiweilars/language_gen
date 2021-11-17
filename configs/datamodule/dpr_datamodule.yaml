@@ -2,23 +2,23 @@ _target_: src.datamodules.dpr_datamodule.DPRDataModule
 
 
 train_data_loader:
-  query_tokenizer: KBLab/roberta-base-swedish-cased
-  passage_tokenizer: KBLab/roberta-base-swedish-cased
-  max_seq_len_query: 256
+  query_tokenizer: KB/bert-base-swedish-cased
+  passage_tokenizer: KB/bert-base-swedish-cased
+  max_seq_len_query: 512
   max_seq_len_passage: 512
   data_dir: ${data_dir}/dpr_data
   data_type: swedish_dpr_train
-  generate_new: False
+  generate_new: True
   batch_size: 2
 
 
 val_data_loader:
-  query_tokenizer: KBLab/roberta-base-swedish-cased
-  passage_tokenizer: KBLab/roberta-base-swedish-cased
-  max_seq_len_query: 256
+  query_tokenizer: KB/bert-base-swedish-cased
+  passage_tokenizer: KB/bert-base-swedish-cased
+  max_seq_len_query: 512
   max_seq_len_passage: 512
   data_dir: ${data_dir}/dpr_data
   data_type: swedish_dpr_dev
-  generate_new: False
+  generate_new: True
   batch_size: 4
   

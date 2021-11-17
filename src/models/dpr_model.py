@@ -16,16 +16,21 @@ from src.models.help_function import object_from_dict
 from transformers import DPRContextEncoder, DPRQuestionEncoder, AutoModel
 
 
-def dpr_loss(question_embedings, pos_embedings, neg_embedings, temp=0.7):
+def dpr_loss(question_embedings, context_embedings, label, loss_fn):
 
-    pos_similar = (question_embedings * pos_embedings).sum(-1)/temp
-    neg_similar = (question_embedings * neg_embedings).sum(-1)/temp
+    scores = torch.matmul(question_embedings.unsqueeze(1), torch.transpose(context_embedings, 2,1))
 
-    #index_select = (pos_similar < neg_similar)
-    
-    loss = torch.log(1+ torch.exp(neg_similar-pos_similar))
-    
-    return loss.mean()
+    q_num = question_embedings.size(0)
+
+    scores = scores.view(q_num, -1)
+
+    softmax_scores = nn.functional.log_softmax(scores, dim=1)
+
+    positive_idx_per_question = torch.tensor([(i == 1).nonzero(as_tuple=False) for i in label]).to(softmax_scores.device)
+
+    loss = loss_fn(scores, positive_idx_per_question)
+
+    return loss
     
     
 
@@ -42,6 +47,8 @@ class DPRModel(pytorch_lightning.LightningModule):
         self.passage_encoder = AutoModel.from_pretrained(model_params['passage_model'])
         
         self.dropout = nn.Dropout(model_params['dropout'])
+
+        self.loss_fn = nn.NLLLoss()
 
         # for parameter in self.query_encoder.parameters():
         #     parameter.requires_grad = False
@@ -76,14 +83,17 @@ class DPRModel(pytorch_lightning.LightningModule):
     def forward(self, inputs):
 
         question_embeddings = self.query_encoder(inputs[0], inputs[1])
-        pos_embeddings = self.passage_encoder(inputs[2], inputs[3])
-        neg_embeddings = self.passage_encoder(inputs[4], inputs[5])
-
         question_embeddings = self.dropout(question_embeddings.pooler_output)
-        pos_embeddings = self.dropout(pos_embeddings.pooler_output)
-        neg_embeddings = self.dropout(neg_embeddings.pooler_output)
 
-        return question_embeddings, pos_embeddings, neg_embeddings
+        b,n,d = inputs[2].shape
+
+        context_embeddings = self.passage_encoder(inputs[2].reshape(b*n,d), inputs[3].reshape(b*n,d))
+        context_embeddings = self.dropout(context_embeddings.pooler_output)
+
+
+        context_embeddings = context_embeddings.reshape(b,n,context_embeddings.shape[1])
+
+        return question_embeddings, context_embeddings
 
 
     def _get_current_lr(self) -> torch.Tensor:
@@ -92,10 +102,9 @@ class DPRModel(pytorch_lightning.LightningModule):
 
     def training_step(self, batch, batch_idx):
 
+        question_embeddings, context_embeddings = self(batch)
         
-        question_embeddings, pos_embeddings, neg_embeddings = self(batch)
-        
-        loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
+        loss = dpr_loss(question_embeddings, context_embeddings, batch[-1], self.loss_fn)
         
         self.log("train_loss", loss)
         
@@ -104,10 +113,9 @@ class DPRModel(pytorch_lightning.LightningModule):
     def validation_step(self, batch, batch_idx):
 
         
-        #pdb.set_trace()
-        question_embeddings, pos_embeddings, neg_embeddings = self(batch)
+        question_embeddings, context_embeddings = self(batch)
         
-        loss = dpr_loss(question_embeddings, pos_embeddings, neg_embeddings)
+        loss = dpr_loss(question_embeddings, context_embeddings, batch[-1], self.loss_fn)
         
         self.log("val_loss", loss)
         

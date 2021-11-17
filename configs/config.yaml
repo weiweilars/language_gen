@@ -2,9 +2,18 @@
 
 # specify here default training configuration
 defaults:
+
+    # long sentence generating
+    # - model: gen_model.yaml
+    # - datamodule: long_datamodule.yaml
+
+    # dpr model
+    - model: dpr_model.yaml
+    - datamodule: dpr_datamodule.yaml
+
     - trainer: trainer.yaml
-    - model: gen_model.yaml
-    - datamodule: long_datamodule.yaml
+    
+
     - callbacks: callback.yaml  # set this to null if you don't want to use callbacks
     - logger: null  # set logger here or use command line (e.g. `python run.py logger=wandb`)
 

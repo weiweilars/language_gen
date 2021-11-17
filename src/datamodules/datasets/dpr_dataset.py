@@ -164,7 +164,7 @@ class DPRDataset(Dataset):
             features['query_segment_ids'] = query_inputs['token_type_ids']
             features['query_attention_mask'] = query_inputs['attention_mask']
 
-
+   
             positive_context = list(filter(lambda x: x["label"] == "positive", dict["passages"]))
             if self.shuffle_positives:
                 random.shuffle(positive_context)
@@ -244,8 +244,9 @@ class DPRDataset(Dataset):
 
         with open(os.path.join(self.save_path, str(index) + '.pkl'), 'rb') as handle:
             data = pickle.load(handle)
+
         data = data['features']
-        return torch.LongTensor(data['query_input_ids']), torch.LongTensor(data['query_attention_mask']), torch.LongTensor(data['passage_input_ids'][0]), torch.LongTensor(data['passage_attention_mask'][0]), torch.LongTensor(data['passage_input_ids'][1]), torch.LongTensor(data['passage_attention_mask'][1])
+        return torch.LongTensor(data['query_input_ids']), torch.LongTensor(data['query_attention_mask']), torch.LongTensor(data['passage_input_ids']), torch.LongTensor(data['passage_attention_mask']), torch.LongTensor(data['label_ids'])
             
             
         
