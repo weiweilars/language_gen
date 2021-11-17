@@ -28,7 +28,7 @@ def dpr_loss(question_embedings, context_embedings, label, loss_fn):
 
     positive_idx_per_question = torch.tensor([(i == 1).nonzero(as_tuple=False) for i in label]).to(softmax_scores.device)
 
-    loss = loss_fn(scores, positive_idx_per_question)
+    loss = loss_fn(softmax_scores, positive_idx_per_question)
 
     return loss
     
