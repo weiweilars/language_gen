@@ -1,7 +1,7 @@
 _target_: pytorch_lightning.Trainer
 
 gpus:
-  - 0
+  - 1
 max_epochs: 500
   # distributed_backend: ddp
 progress_bar_refresh_rate: 1
