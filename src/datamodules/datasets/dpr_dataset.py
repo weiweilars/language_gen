@@ -11,7 +11,7 @@ import pickle
 from tqdm import tqdm
 logger = logging.getLogger(__name__)
 
-def read_dpr_json(file, max_samples=None, proxies=None, num_hard_negatives=1, num_positives=1, shuffle_negatives=True, shuffle_positives=False):
+def read_dpr_json(file, max_samples=None, proxies=None, num_hard_negatives=10, num_positives=1, shuffle_negatives=True, shuffle_positives=False):
     """
     Reads a Dense Passage Retrieval (DPR) data file in json format and returns a list of dictionaries.
     :param file: filename of DPR data in json format
@@ -83,13 +83,13 @@ class DPRDataset(Dataset):
             max_seq_len_query=256,
             max_seq_len_passage=512,
             data_dir="data/dpr_data",
-            data_type="swedish_dpr_dev",
+            data_type="swedish_dpr_train",
             max_samples=None,
             embed_title=False,
             num_positives=1,
-            num_hard_negatives=1,
+            num_hard_negatives=10,
             shuffle_negatives=True,
-            shuffle_positives=False,
+            shuffle_positives=True,
             generate_new=True):
 
     
@@ -136,6 +136,7 @@ class DPRDataset(Dataset):
     def _convert_queries(self, dicts):
 
         for idx, dict in enumerate(tqdm(dicts)):
+
             clear_text = {}
             tokenized = {}
             features = {}
