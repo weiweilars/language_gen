@@ -1,7 +1,7 @@
 _target_: src.models.gen_model.SkosaGenModel
 
 model:
-  model_folder: ${model_dir}/skosa_model
+  model_folder: birgermoell/swedish-gpt
   save_model_folder: ${model_dir}/saved_qa_model
   modified_voc_len: 50400
   freeze_layers: 6
