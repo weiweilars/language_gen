@@ -4,7 +4,7 @@ model:
   model_folder: birgermoell/swedish-gpt
   save_model_folder: ${model_dir}/saved_qa_model
   modified_voc_len: 50400
-  freeze_layers: 6
+  freeze_layers: 10
 
 optimizer:
   type: torch.optim.Adam
