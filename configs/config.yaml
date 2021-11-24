@@ -4,12 +4,12 @@
 defaults:
 
     # long sentence generating
-    # - model: gen_model.yaml
-    # - datamodule: long_datamodule.yaml
+    - model: gen_model.yaml
+    - datamodule: long_datamodule.yaml
 
     # dpr model
-    - model: dpr_model.yaml
-    - datamodule: dpr_datamodule.yaml
+    # - model: dpr_model.yaml
+    # - datamodule: dpr_datamodule.yaml
 
     - trainer: trainer.yaml
     

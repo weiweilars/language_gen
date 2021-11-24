@@ -58,3 +58,4 @@ class SkosaGenDataModule(LightningDataModule):
                             batch_size=self.batch_size,
                             shuffle=False)
         return result
+    

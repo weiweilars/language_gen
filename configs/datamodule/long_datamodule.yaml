@@ -3,7 +3,7 @@ _target_: src.datamodules.gen_datamodule.SkosaGenDataModule
 
 data_loader:
   dataset: LongTextDataset
-  max_token_size: 128
+  max_token_size: 512
   data_folder: ${data_dir}/swedish_pdf
   model_folder: ${model_dir}/long_text_generator
   num_workers: 12

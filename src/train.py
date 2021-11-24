@@ -7,8 +7,11 @@ from pytorch_lightning import seed_everything
 import hydra
 from omegaconf import DictConfig
 import pdb
+import os
 
 from src.utils import utils
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 log = utils.get_logger(__name__)
 

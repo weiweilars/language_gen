@@ -15,8 +15,9 @@ from transformers import GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel, GPT2
 import re
 import time
 import subprocess
+import os
 
-
+from src.datamodules.datasets.PDFReader import Clean_PDF
 
 
 class SkosaGenDataset(Dataset):
@@ -132,21 +133,20 @@ class SkosaQADataset(Dataset):
 class LongTextDataset(Dataset):
 
     input_path_name = 'input'
-    data_name = 'site_content.json'
+    data_name = 'text.pdf'
 
     def __init__(self, data_folder, model_folder, max_token_size=512, remove_numeric_tables=True):
 
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained(model_folder)
-        self.data_path = os.path.join(data_folder, self.data_name)
+        #self.data_path = os.path.join(data_folder, self.data_name)
         self.input_path = os.path.join(data_folder, self.input_path_name)
         self.max_token = max_token_size
         self.remove_numeric_tables = remove_numeric_tables
-
-
-        
             
-        text = self._read_json(self.data_path)
+        result = Clean_PDF(self.data_name, data_folder)
+
+        text = result.run()
 
         tokenized_text = self.tokenizer.convert_tokens_to_ids(self.tokenizer.tokenize(text))
         # self.tokenizer.add_special_tokens({'pad_token': '[PAD]', 'sep_token': '[SEP]'})
@@ -154,8 +154,8 @@ class LongTextDataset(Dataset):
         # self.tokenizer.save_pretrained(model_folder)
 
         self.examples = []
-        for i in range(0, len(tokenized_text) - max_token_size + 1, max_token_size):
-                self.examples.append(tokenized_text[i : i + max_token_size])
+        for i in range(0, len(tokenized_text) - max_token_size + 1, max_token_size-1):
+            self.examples.append(tokenized_text[i : i + max_token_size-1] + [self.tokenizer.eos_token_id])
 
 
         self.data_length = len(self.examples)
@@ -169,7 +169,6 @@ class LongTextDataset(Dataset):
             temp = i['content']
             clean_text.append(temp.splitlines())
 
-        pdb.set_trace()
         return clean_text
 
 
@@ -177,8 +176,7 @@ class LongTextDataset(Dataset):
         command = ["pdftotext", "-enc", encoding, str(file_path), "-"]
         output = subprocess.run(command, stdout=subprocess.PIPE, shell=False)  # type: ignore
         document = output.stdout.decode(errors="ignore")
-
-        pdb.set_trace()
+        
         pages = document.split("\f")
         
         pages = pages[:-1]  # the last page in the split is always empty.
