@@ -5,7 +5,7 @@ data_loader:
   dataset: LongTextDataset
   max_token_size: 512
   data_folder: ${data_dir}/swedish_pdf
-  model_folder: ${model_dir}/long_text_generator
+  model_folder: birgermoell/swedish-gpt
   num_workers: 12
   batch_size: 2
   test_ratio: 0.2

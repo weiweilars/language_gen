@@ -5,7 +5,7 @@ defaults:
 
     # long sentence generating
     - model: gen_model.yaml
-    - datamodule: gen_datamodule.yaml
+    - datamodule: long_datamodule.yaml
 
     # dpr model
     # - model: dpr_model.yaml
