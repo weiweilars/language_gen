@@ -138,7 +138,7 @@ class LongTextDataset(Dataset):
     def __init__(self, data_folder, model_folder, max_token_size=512, remove_numeric_tables=True):
 
 
-        print("model_folder")
+        print(model_folder)
         self.tokenizer = GPT2TokenizerFast.from_pretrained(model_folder)
         #self.data_path = os.path.join(data_folder, self.data_name)
         self.input_path = os.path.join(data_folder, self.input_path_name)
