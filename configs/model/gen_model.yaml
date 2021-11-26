@@ -2,13 +2,14 @@ _target_: src.models.gen_model.SkosaGenModel
 
 model:
   model_folder: birgermoell/swedish-gpt
-  save_model_folder: ${model_dir}/saved_qa_model
+  #model_folder: gpt2
+  save_model_folder: ${model_dir}/saved_long_model
   modified_voc_len: 50400
-  freeze_layers: 10
+  freeze_layers: 0
 
 optimizer:
   type: torch.optim.Adam
-  lr: 0.0003
+  lr: 0.00003
 
 scheduler:
   type: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts

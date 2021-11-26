@@ -59,8 +59,8 @@ class Read_PDF:
     
     def create_TitleObjects(self):
         if self.pageObjects == []:
-            self.create_PageObjects()
-        
+            self.create_PageObjects(self)
+
         self.titleObject = [Title(*page.get_values()) for page in self.pageObjects if page.level == 0]
         for title, title_next in zip(self.titleObject[:-1], self.titleObject[1:]):
             title.next = title_next
@@ -69,38 +69,17 @@ class Read_PDF:
     
     def get_header(self):
         pageObj = self.reader.getPage(0)
-        first = pageObj.extractText().strip()
-
-        first_cleaned = re.sub('\n', '', first)
-        if len(re.split('[0-9]+ \\([0-9]+\\)', first_cleaned)) == 2:
-            first_page = re.split('[0-9]+ \\([0-9]+\\)', first_cleaned)
-        elif first.count('\n') == 1:
-            first_page = first.split('\n')
-        elif first.count(' \n ') == 1:
-            first_page = first.split(' \n ')
-        #elif re.sub('( ) +', '  ', first).count('  ') == 1:
-        #    first = re.sub('( ) +', '  ', first)
-        #    first_page = first.split('  ')
-        else:
-            first = re.sub('\n', '', first)
-            first = re.sub(' +', ' ', first)
-            break_point = re.search('Vägledning [0-9]+:[0-9]+ Version [0-9]+', first)
-            if break_point == None:
-                first_page = []
-            else:
-                break_point = break_point.end()
-                first_page = [first[:break_point], first[break_point:]]
-
+        first_page = pageObj.extractText().split('  ')
         assert len(first_page) >= 2, "Can't divide the first page into title and headnote"
 
         head = first_page[0]
-        head = re.sub('\n', '', head)
         head = head.strip()
+        head = re.sub('\n', '', head)
 
         title = first_page[1]
-        title = re.sub('\n', '', title)
         title = title.strip()
-
+        title = re.sub('\n', '', title)
+        
         return head, title
 
 class Clean_PDF(Read_PDF):
@@ -111,39 +90,17 @@ class Clean_PDF(Read_PDF):
         self.remove_pages = [self.title, "Innehåll", "Förkortningar", "Källförteckning"]    # this list can be changed
         self.remove_text = [self.head, '(\n+| +)?[0-9]+(\n+| +)?\\( ?[0-9]+ ?\\)(\n+| +)?', '\x0c']
         self.pagenumbers = []   #saved
-        self.remove_before = 'Sammanfattning'
-        self.remove_after = 'Källförteckning'
 
     def _add_pagenumbers(self):
         titles = self.create_TitleObjects()
 
-        remove_pagenumbers = set()
-        if titles == []:
-            A = 0
-            B = self.reader.getNumPages()
-            for i in range(B):
-                text = self.reader.getPage(i).extractText()
-                if self.remove_before in text[:100]:
-                    A = i
-                if self.remove_after in text[:100]:
-                    B = i
-            for i in range(A):
-                remove_pagenumbers.add(i)
-            for i in range(B, self.reader.getNumPages()):
-                remove_pagenumbers.add(i)            
-        else:
-            for title in titles:
-                if title.title in self.remove_pages:
-                    start = title.page_nr
-                    stop = self.reader.getNumPages() if title.next == None else title.next.page_nr
-                    for i in range(start, stop):
-                        remove_pagenumbers.add(i)
-                if title.title == self.remove_before:
-                    for i in range(title.page_nr):
-                        remove_pagenumbers.add(i)
-                if title.title == self.remove_after:
-                    for i in range(title.page_nr, self.reader.getNumPages()):
-                        remove_pagenumbers.add(i)
+        remove_pagenumbers = []
+        for title in titles:
+            if title.title in self.remove_pages:
+                start = title.page_nr
+                stop = self.reader.getNumPages() if title.next == None else title.next.page_nr
+                for i in range(start, stop):
+                    remove_pagenumbers.append(i)
 
         for page_nr in range(self.reader.getNumPages()):
             if page_nr not in remove_pagenumbers:
@@ -193,62 +150,14 @@ class Clean_PDF(Read_PDF):
 
 
 if __name__ == '__main__':
-    #file_name = "vagledning-2004-05.pdf"
-    #file_name = "vagledning-2021-01.pdf"
-    #file_name = "vagledning-2018-04.pdf"
-    #file_name = "vagledning-2018-03.pdf"
-    #file_name = "vagledning-2018-02.pdf"
-    #file_name = "vagledning-2018-01.pdf"
-    #file_name = "vagledning-2017-02.pdf"
-    #file_name = "vagledning-2017-01.pdf"
-    #file_name = "Vagledning-2016-2.pdf"
-    #file_name = "vagledning-2016-01.pdf"
-    #file_name = "vagledning-2015-01.pdf"
-    #file_name = "vagledning-2013-03.pdf"
-    #file_name = "vagledning-2013-02.pdf"
-    #file_name = "vagledning-2013-01.pdf"
-    #file_name = "vagledning-2012-03.pdf"
-    #file_name = "vagledning-2012-02.pdf"
-    #file_name = "vagledning-2012-01.pdf"
-    #file_name = "vagledning-2011-01.pdf"
-    #file_name = "vagledning-2010-03.pdf"
-    #file_name = "vagledning-2010-02.pdf"
-    #file_name = "vagledning_2010_01.pdf"
-    file_name = "vagledning-2009-02.pdf"
-    file_name = "vagledning-2009-01.pdf"
-    file_name = "vagledning-2008-02.pdf"
-    file_name = "vagledning-2006-01.pdf"
-    file_name = "vagledning-2005-03.pdf"
-    file_name = "vagledning-2005-02.pdf"
-    file_name = "vagledning-2005-01.pdf"
-    file_name = "vagledning-2004-10.pdf"
-    file_name = "vagledning-2004-08.pdf"
-    file_name = "vagledning-2004-07.pdf"
-    file_name = "vagledning-2004-06.pdf"
-    file_name = "vagledning-2004-03.pdf"
-    file_name = "vagledning-2004-01.pdf"
-    file_name = "vagledning-2003-06.pdf"
-    file_name = "vagledning-2003-04.pdf"
-    file_name = "vagledning-2003-03.pdf"
-    file_name = "vagledning-2003-01.pdf"
-    file_name = "vagledning-2002-14.pdf"
-    file_name = "vagledning-2002-12.pdf"
-    file_name = "vagledning-2002-10.pdf"
-    file_name = "vagledning-2002-06.pdf"
-    file_name = "vagledning-2002-03.pdf"
-    file_name = "vagledning-2002-01.pdf"
-    file_name = "vagledning-2001-09.pdf"
-    file_name = "vagledning-2001-07.pdf"
-    file_name = "vagledning-2001-03.pdf"
-    file_name = "vagledning-2001-02.pdf"
+    file_name = "vagledning-2004-05.pdf"
     path = os.path.dirname(os.path.abspath(__file__))
 
     cleaned_file = Clean_PDF(file_name, path)
     text = cleaned_file.run()
     
     # print some part of the text:
-    print(text[:1000])
+    print(text[:10000])
 
     # print the whole text:
     #print(text)
-

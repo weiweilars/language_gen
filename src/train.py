@@ -13,8 +13,18 @@ from src.utils import utils
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+from transformers import (
+    BertConfig, BertForMaskedLM, BertTokenizer,
+    GPT2Config, GPT2LMHeadModel, GPT2Tokenizer)
+
+
 log = utils.get_logger(__name__)
 
+
+MODEL_CLASSES = {
+    'gpt2': (GPT2Config, GPT2LMHeadModel, GPT2Tokenizer),
+    'bert': (BertConfig, BertForMaskedLM, BertTokenizer)
+}
 
 def train(config: DictConfig) -> Optional[float]:
     """Contains training pipeline.

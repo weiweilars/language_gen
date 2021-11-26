@@ -10,7 +10,7 @@ import json
 from collections import OrderedDict
 import torch
 from torch.utils.data import Dataset
-from transformers import GPT2TokenizerFast, GPT2Tokenizer, GPT2LMHeadModel, GPT2Config
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, GPT2TokenizerFast
 
 import re
 import time
@@ -18,7 +18,7 @@ import subprocess
 import os
 
 from src.datamodules.datasets.PDFReader import Clean_PDF
-
+#from PDFReader import Clean_PDF
 
 class SkosaGenDataset(Dataset):
 
@@ -133,21 +133,30 @@ class SkosaQADataset(Dataset):
 class LongTextDataset(Dataset):
 
     input_path_name = 'input'
-    data_name = 'text.pdf'
+    
 
     def __init__(self, data_folder, model_folder, max_token_size=512, remove_numeric_tables=True):
 
 
         print(model_folder)
-        self.tokenizer = GPT2TokenizerFast.from_pretrained(model_folder)
+        self.tokenizer = GPT2Tokenizer.from_pretrained(model_folder)
         #self.data_path = os.path.join(data_folder, self.data_name)
         self.input_path = os.path.join(data_folder, self.input_path_name)
         self.max_token = max_token_size
         self.remove_numeric_tables = remove_numeric_tables
-            
-        result = Clean_PDF(self.data_name, data_folder)
 
-        text = result.run()
+
+        files = [f for f in os.listdir(data_folder)]
+        text = ''
+        for file in files:
+            result = Clean_PDF(file, data_folder)
+
+            text += (result.run() + '\n\n\n')
+
+            print(len(text))
+
+        # with open(self.data_path, encoding="utf-8") as f:
+        #     text = f.read()
 
         tokenized_text = self.tokenizer.convert_tokens_to_ids(self.tokenizer.tokenize(text))
         # self.tokenizer.add_special_tokens({'pad_token': '[PAD]', 'sep_token': '[SEP]'})
@@ -155,8 +164,8 @@ class LongTextDataset(Dataset):
         # self.tokenizer.save_pretrained(model_folder)
 
         self.examples = []
-        for i in range(0, len(tokenized_text) - max_token_size + 1, max_token_size-1):
-            self.examples.append(tokenized_text[i : i + max_token_size-1] + [self.tokenizer.eos_token_id])
+        for i in range(0, len(tokenized_text) - max_token_size + 1, max_token_size):
+            self.examples.append(self.tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + max_token_size-1]))
 
 
         self.data_length = len(self.examples)
@@ -230,7 +239,7 @@ if __name__ == '__main__':
     
     # dataset=SkosaQADataset(data_path, tokenizer_path)
 
-    data_path = "../../../data/swedish_pdf/"
+    data_path = "../../../data/fk/"
     tokenizer_path = "../../../models/long_text_generator"
 
     dataset=LongTextDataset(data_path, tokenizer_path)

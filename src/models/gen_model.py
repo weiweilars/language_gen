@@ -15,6 +15,7 @@ class SkosaGenModel(pytorch_lightning.LightningModule):
 
         model_params = self.hparams['model'].copy()
 
+        
         self.model = GPT2LMHeadModel.from_pretrained(model_params['model_folder'])
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained(model_params['model_folder'])

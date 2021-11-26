@@ -4,10 +4,11 @@ _target_: src.datamodules.gen_datamodule.SkosaGenDataModule
 data_loader:
   dataset: LongTextDataset
   max_token_size: 512
-  data_folder: ${data_dir}/swedish_pdf
+  data_folder: ${data_dir}/fk
   model_folder: birgermoell/swedish-gpt
+  #model_folder: gpt2
   num_workers: 12
-  batch_size: 2
+  batch_size: 8
   test_ratio: 0.2
   seed: 1234
   
